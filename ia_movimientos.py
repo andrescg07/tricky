@@ -1,7 +1,7 @@
 
 # HOLA SOY YO, DESDE LA OTRA PC
 
-#HOLA
+#HOLA 
 import random
 
 # tablero = [[' ', ' ', ' '],
