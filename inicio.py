@@ -1,6 +1,7 @@
 import tricky
 
 
+
 tablero_numeros = ['1', '2', '3',
                    '4', '5', '6',
                    '7', '8', '9']
@@ -21,9 +22,10 @@ while True:
     print('2. Jugar con otra persona ')
     print('3. Salir del juego')
 
-    entrada_usuario = input('Ingresa el numero de la opcion aquí: \n')
+    entrada_usuario = input('Ingresa el numero de la opcion aquí: ')
+    print('\n')
     if entrada_usuario == '1':
-        juego_M = tricky.tricky()
-        print(juego_M)
+        vs_maquina = tricky.tricky()
+        print(vs_maquina)
     elif entrada_usuario == '3':
         break

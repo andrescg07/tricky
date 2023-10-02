@@ -41,7 +41,7 @@ def tricky():
     jugador_X = 'X'
     posiciones_disponibles = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     tablero = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
-    progreso = []
+ 
 
     while len(posiciones_disponibles) >= 1:
 
@@ -54,22 +54,25 @@ def tricky():
                 primer_turno = primer_turno - 1
 
                 if primer_turno in posiciones_disponibles:
+                    tablero = actualizar_tablero(tablero, primer_turno, jugador_X)
+                    posiciones_disponibles.remove(primer_turno)
                     break
                 else:
                     print('¡Ingresa posiciones que no esten ocupadas!')
             except ValueError:
                 print('¡Valores no validos!')
 
-        tablero = actualizar_tablero(tablero, primer_turno, jugador_X)
-        posiciones_disponibles.remove(primer_turno)
+
 
         if len(posiciones_disponibles) > 0:
             segundo_turno = ia_movimientos.escoger_movimiento(
-                tablero, combinaciones_tricky)
-            print(f'La maquina escogió: {segundo_turno}')
+                tablero, combinaciones_tricky, posiciones_disponibles)
+            print(f'ia movimiento: {segundo_turno}')
+            
             tablero = actualizar_tablero(
                 tablero, segundo_turno, jugador_O)
             posiciones_disponibles.remove(segundo_turno)
+            print(f'posiciones disponibles: {posiciones_disponibles}')
             print(
                 f'has puesto {jugador_X} en la posicion {primer_turno + 1} y la maquina puso {jugador_O} en la posicion {segundo_turno + 1}: \n')
 
@@ -78,15 +81,18 @@ def tricky():
         while len(posiciones_disponibles) <= 6:
             gano_x = ganador(combinaciones_tricky, tablero, jugador_X)
             if gano_x is True:
-                return f'El jugador {jugador_X} ha hecho tricky y ha ganado el juego'
+                print('JUEGO TERMINADO')
+                return f'El jugador {jugador_X} ha hecho tricky y ha ganado el juego \n '
             gano_o = ganador(combinaciones_tricky, tablero, jugador_O)
             if gano_o is True:
-                return f'El jugador {jugador_O} ha hecho tricky y ha ganado el juego'
+                print('JUEGO TERMINADO')
+                return f'El jugador {jugador_O} ha hecho tricky y ha ganado el juego \n '
             break
 
-    return 'Opps, has empatado con la maquina, ha estado parejo '
+    print('JUEGO TERMINADO')
+    return 'Opps, has empatado con la maquina, ha estado parejo \n'
 
 
-if __name__ == '__main__':
-    jugar = tricky()
-    print(jugar)
+# if __name__ == '__main__':
+#     jugar = tricky()
+#     print(jugar)
