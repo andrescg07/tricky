@@ -1,17 +1,17 @@
 import random
 
+
 def atacar(tabla, posiciones):
     while True:
         decision = random.choice(posiciones)
         if tabla[decision] == ' ':
             return decision
-     
+
 
 def posible_tricky(tabla, casillas, combinaciones, ventaja):
-
+    acumulado = 0
+    marcar_casilla = 0
     for combinacion in combinaciones:
-        acumulado = 0
-        marcar_casilla = 0
         for num in combinacion:
             if int(num) in casillas:
                 acumulado += 1
@@ -19,17 +19,17 @@ def posible_tricky(tabla, casillas, combinaciones, ventaja):
                 marcar_casilla = int(num)
         if acumulado == 2 and tabla[marcar_casilla] == ' ':
             return marcar_casilla
-        
+
     if acumulado == 1 and tabla[marcar_casilla] == ' ':
         return marcar_casilla
     else:
-        proponer =  atacar(tabla, ventaja)
+        proponer = atacar(tabla, ventaja)
         return proponer
 
     return False
 
 
-def escoger_movimiento(tabla: list, combinaciones: list, disponibles:list):
+def escoger_movimiento(tabla: list, combinaciones: list, disponibles: list):
     while True:
         combinaciones_tricky = combinaciones
         proximo_movimiento = 0
@@ -55,7 +55,8 @@ def escoger_movimiento(tabla: list, combinaciones: list, disponibles:list):
             if peligro_alto:
                 proximo_movimiento = peligro_alto
             else:
-                pasar_al_ataque = posible_tricky(tabla, posiciones_o, combinaciones_tricky, posiciones_ventaja)
+                pasar_al_ataque = posible_tricky(
+                    tabla, posiciones_o, combinaciones_tricky, posiciones_ventaja)
                 if pasar_al_ataque:
                     proximo_movimiento = atacar
 
