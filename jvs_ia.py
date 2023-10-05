@@ -3,7 +3,8 @@
 
 # validar la dificultad del juego deseada
 def validar_nivel() -> str:
-    """Pedir al usuario que escoja la dificultad del juego vs La maquina, validarlo y retornarlo"""
+    print(' \033[1m JUEGO CONTRA LA IA \033[0m \n')
+    """ Pedir al usuario que escoja la dificultad del juego vs La maquina, validarlo y retornarlo"""
     while True:
         nivel = input(
             "Ingrese el nivel de dificultad de la IA, 'facil'/ 'dificil': ")
