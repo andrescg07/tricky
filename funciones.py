@@ -1,46 +1,52 @@
-# ------------------------------- TRICKY ----------------------------------
-# import ia_movimientos
 
-def definir_turnos(primero, segundo, ronda) -> list:
+def definir_turnos(primero: str, segundo: str, ronda: int) -> list:
     turno1, turno2, valor1, valor2 = "", "", "", ""
     if ronda % 2 == 0:
-        turno1 = segundo
-        turno2 = primero
-        valor1 = 'O'
-        valor2 = 'X'
+        turno1, valor1, turno2, valor2 = segundo, 'X', primero, 'O'
+
     else:
-        turno1 = primero
-        turno2 = segundo
-        valor1 = 'X'
-        valor2 = 'O'
-    turnos_asignados = [turno1, valor1, turno2, valor2]
-    return turnos_asignados
+        turno1, valor1, turno2, valor2 = primero, 'X', segundo, 'O'
+
+    return [turno1, valor1, turno2, valor2]
 
 
-def actualizar_tablero(tabla, posicion, valor):
+def validar_posicion(disponibles: list) -> int:
+    """Pedir al usuario, ingresar una posicion y retornarla para actualizar el tablero"""
+    while True:
+        try:
+            entrada_usuario = int(
+                input('Ingresa una posicion 1-9 para marcar en le tablero: '))
+            if entrada_usuario in disponibles:
+                return entrada_usuario
+            else:
+                print(
+                    f'la posicion {entrada_usuario} está ocupada o no es valida, pruebe nuevamente ')
+        except ValueError:
+            print('Error al ingresar la posicion, valor no valido')
 
-    tabla[posicion] = valor
+
+def actualizar_tablero(tabla: list, posicion: int, valor: str) -> list:
+    """reemplazar y actualizar cada posicion validada con el valor X/O por cada jugador"""
+    tabla[posicion - 1] = valor
     return tabla
 
 
-def ganador(combinaciones, tablero, jugador):
-
-    acumulado = 0
-
+def validar_ganador(combinaciones: list, tablero: list, jugador: str):
+    """ Recibir el tablero y validar si un jugador ha hecho tricky"""
     for combinacion in combinaciones:
-        for num in combinacion:
-            entero = int(num)
-            if tablero[entero] == jugador:
-                acumulado += 1
-        if acumulado == 3:
+        if all(tablero[int(num)] == jugador for num in combinacion):
             return True
-        acumulado = 0
 
-    if acumulado != 3:
-        return False
+    return False
 
 
-def mostrar_tablero(tablero):
+def mostrar_tablero(tablero: list, victorias: dict, j1: str, j2: str, disponibles: list):
+    """Mostrar e imprimir el marcador de victorias, el tabalero actualizado en cada ronda e iteracion"""
+    print('\033[1mVICTORIAS:\033[0m ')
+    print(f'{j1.lower()} == {victorias[j1]} ------- {j2.lower()} == {victorias[j2]} ')  # noqa
+    print(
+        f'Posiciones disponibles tablero: {[i+1 for i in disponibles]} \n')
+
     for casilla in range(0, len(tablero), 3):
         fila = tablero[casilla:casilla+3]
         print(' | '.join(fila))
