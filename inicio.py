@@ -1,10 +1,10 @@
-# Importamos los modulos '.py' (contienen y ejecutan el juego) para ser llamados luego:
+""" Importamos los modulos '.py' (contienen y ejecutan el juego) para ser llamados luego:"""
 import jcj
 import jvs_ia
 
 
 def mostrar_menu():
-    # representacion de las posiciones del juego y sus respectivos numeros:
+    """representacion de las posiciones del juego y sus respectivos numeros:"""
     tablero_numeros = ['1', '2', '3',
                        '4', '5', '6',
                        '7', '8', '9']
@@ -21,11 +21,6 @@ def mostrar_menu():
         print(' | '.join(fila))
         print('----------' if i < 6 else '')
 
-    print('MENÚ DE OPCIONES')
-    print('1. Jugar con la maquina')
-    print('2. Jugar con otra persona ')
-    print('3. Salir del juego \n')
-
 
 # Pedir al usuario ingresar una opcion del menu anterior, validar cada caso y pasarlo a la funcion main():
 while True:
@@ -35,7 +30,7 @@ while True:
         print('\n')
         if entrada_usuario in ['1', '2', '3']:
             if entrada_usuario == '1':
-                vs_maquina = jvs_ia
+                vs_maquina = jvs_ia.juego_JvsIA()
             elif entrada_usuario == '2':
                 uno_vs_uno = jcj.juego_JCJ()
             else:

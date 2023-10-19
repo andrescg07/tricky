@@ -11,7 +11,6 @@ def juego_JCJ():
                             '012', '147', '345', '258', '678']
     contador_t1 = 0
     contador_t2 = 0
-    terminar_juego = False
 
     j1 = input('Nombre del primer jugador: ')
     j2 = input('Nombre del seguo u otro jugador: ')
@@ -35,7 +34,8 @@ def juego_JCJ():
 
         while posiciones_disponibles:
 
-            t1 = funciones.validar_posicion(posiciones_disponibles)
+            t1 = funciones.validar_posicion(
+                posiciones_disponibles, primer_turno)
             tablero = funciones.actualizar_tablero(
                 tablero, t1, primer_valor)
             posiciones_disponibles.remove(t1)
@@ -44,23 +44,34 @@ def juego_JCJ():
             funciones.mostrar_tablero(
                 tablero, victorias, j1, j2, posiciones_disponibles)
 
-            if len(posiciones_disponibles) < 5:
-                resultado = funciones.validar_ganador(combinaciones_tricky, tablero, primer_valor)  # noqa
-                if resultado:  
-                    contador_t1 += 1
-                    victorias[primer_turno] = contador_t1
+            if funciones.validar_ganador(combinaciones_tricky, tablero, primer_valor):
+                contador_t1 += 1
+                victorias[primer_turno] = contador_t1
+                print(f'{primer_turno} ganó el juego, hizo tricky con la "{primer_valor}"')  # noqa
                 break
 
-            if posiciones_disponibles:
+            if not posiciones_disponibles:
+                print(
+                    f'{primer_turno} y {segundo_turno} han empatado, el juego estuvo parejo')
+                break
 
+            t2 = funciones.validar_posicion(
+                posiciones_disponibles, segundo_turno)
+            tablero = funciones.actualizar_tablero(
+                tablero, t2, segundo_valor)
+            posiciones_disponibles.remove(t2)
+            funciones.mostrar_tablero(
+                tablero, victorias, j1, j2, posiciones_disponibles)
 
-        print(f'{primer_turno} y {segundo_turno} han empatado, el juego estuvo parejo')
+            if funciones.validar_ganador(combinaciones_tricky, tablero, segundo_valor):
+                contador_t2 += 1
+                victorias[segundo_turno] = contador_t2
+                print(
+                    f'{segundo_turno} ganó el juego, hizo tricky con la "{segundo_valor}"')
+                break
 
         seguir_jugando = input('¿Seguir jugando 1 vs 1 Si/No?: ')
-
         if seguir_jugando.lower() == 'no':
             break
-        elif seguir_jugando.lower() == 'no':
-            terminar_juego = True
 
     return 'Menú'
