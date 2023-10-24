@@ -1,150 +1,118 @@
 import pygame
 import sys
-import tkinter as tk
-import funciones
 import ia_movimientos
+import funciones
 # ---------------------------------------------------------
 
 
-def empezar_juegoIa(dificultad: str, nombre: str, pantalla):  #
+def empezar_juegoIa(dificultad: str, nombre: str, pantalla):
+
+    # Constantes par ausar en el tablero
     pantalla.destroy()
-    ANCHO = 1200
-    ALTO = 680
-    COLOR_FONDO = (28, 170, 156)
-    ROJO = (200, 0, 0)
-    COLOR_LINEAS = (23, 145, 135)
+    ANCHO = 600
+    ALTO = 700
     ANCHO_LINEAS = 15
-    NEGRO = (0, 0, 0)
+
+    COLOR_FONDO = (180, 180, 180)
     COLOR_BOLA = (239, 231, 200)
     COLOR_EQUIS = (52, 73, 94)
+
+    # Pygame pantalla del juego
     pygame.init()
-    fuente = pygame.font.Font(None, 36)
     ventana = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption('VS IA - FACIL')
     ventana.fill(COLOR_FONDO)
-
-    tablero = [' ' for _ in range(9)]
-    combinaciones_tricky = [['036', '147', '258'],
-                            ['012', '345', '678'], ['642'], ['048']]
-    contador_t1 = 0
-    contador_t2 = 0
-
-    j1 = nombre
-    j2 = 'ia'
+    funciones.dibujar_lineas(ventana)
+    tablero = [[0 for _ in range(3)] for _ in range(3)]
+    victorias = [0, 0]
     ronda = 0
-    victorias = {j1: 0, j2: 0}
-
-    def obtener_posicion(fila: int, columna: int) -> int:
-        """convierte una fila y columna a la posicion en un tablero plano [0,1,2,3,4,5,6,7,8]
-
-        Args: 
-            fila (int): Numero de la fila 0-2 marcada
-            columna (int): Numero de la columna 0-2 marcada
-        Returns:
-            posicion (int) : Numero Posicion 0-8 en un tablero plano
-            -1 (int): en caso de que la posicion marcada no sea valida
-        """
-
-        if 0 <= fila <= 2 and 0 <= columna <= 2:
-            posicion = fila * 3 + columna
-            return posicion
-        else:
-            # Devolver un valor fuera de rango si la fila o la columna no son válidas
-            return -1
-
-    def validar_ganador(combinaciones: list, tablero: list, jugador: int):
-        """ Recibir el tablero y validar si un jugador ha hecho tricky"""
-        for llave in combinaciones:
-            for combinacion in llave:
-                if all(tablero[int(num)] == jugador for num in combinacion):
-                    lineas_ganadoras()
-            return True
-
-        return False
-
-    def dibujar_lineas():
-        # Horizontales
-        pygame.draw.line(ventana, COLOR_LINEAS, (100, 240),
-                         (700, 240), ANCHO_LINEAS)
-        pygame.draw.line(ventana, COLOR_LINEAS, (100, 440),
-                         (700, 440), ANCHO_LINEAS)
-
-        # Verticales
-        pygame.draw.line(ventana, COLOR_LINEAS, (300, 40),
-                         (300, 640), ANCHO_LINEAS)
-        pygame.draw.line(ventana, COLOR_LINEAS, (500, 40),
-                         (500, 640), ANCHO_LINEAS)
-    dibujar_lineas()
-
-    texto = fuente.render(
-        f'Marcador: {nombre} "X" - SAMUEL "O"', True, NEGRO)
-    ventana.blit(texto, (750, 60))
-
-    posiciones_disponibles = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     player = 1
-    ganador_ronda = 0
+    funciones.marcador(ventana, nombre, victorias, ronda)
     fin = False
-    while True:
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                sys.exit()
+    p_disponibles = [9]
+    resultado = ""
+    try:
+        while True:
+            p_disponibles = []
+            for fila in range(3):
+                for col in range(3):
+                    if tablero[fila][col] == 0:
+                        p_disponibles.append([fila, col])
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    sys.exit()
 
-            if evento.type == pygame.MOUSEBUTTONDOWN and not fin:
-                clickX = evento.pos[0]
-                clickY = evento.pos[1]
+                if (evento.type == pygame.MOUSEBUTTONDOWN and p_disponibles) and not fin:
 
-                fila_pulsada = int(clickY - 40) // 200
-                columna_pulsada = int(clickX - 100) // 200
-                print(fila_pulsada, columna_pulsada)
+                    clickX = evento.pos[0]
+                    clickY = evento.pos[1]
 
-                X = int(columna_pulsada * 200 + 200)
-                Y = int(fila_pulsada * 200 + 140)
+                    fila_pulsada = int(clickY - 80) // 200
+                    columna_pulsada = int(clickX // 200)
 
-                ronda += 1
-                # turnos = funciones.definir_turnos(j1, j2, ronda)
-                # primer_turno, primer_valor, segundo_turno, segundo_valor = turnos[0],  turnos[1], turnos[2], turnos[3]
-                posicion = obtener_posicion(
-                    fila_pulsada, columna_pulsada)
-                if player == 1 and posicion in posiciones_disponibles:
-                    tablero[posicion] = player
-                    posiciones_disponibles.remove(posicion)
-                    pygame.draw.circle(ventana, COLOR_BOLA, (X, Y), 60, 15)
-                    player = 2
-                elif player == 2 and posicion in posiciones_disponibles:
-                    tablero[posicion] = player
-                    posiciones_disponibles.remove(posicion)
-                    pygame.draw.line(
-                        ventana, COLOR_EQUIS, (X - 60, Y - 60), (X + 60, Y + 60), 25)
-                    pygame.draw.line(
-                        ventana, COLOR_EQUIS, (X - 60, Y + 60), (X + 60, Y - 60), 25)
-                    player = 1
+                    X = int(columna_pulsada * 200 + 100)
+                    Y = int(fila_pulsada * 200 + 180)
 
-                while len(posiciones_disponibles) <= 6:
+                    # turnos = funciones.definir_turnos(j1, j2, ronda)
+                    # primer_turno, primer_valor, segundo_turno, segundo_valor = turnos[0],  turnos[1], turnos[2], turnos[3]
 
-                    ganarJ1 = validar_ganador(combinaciones_tricky, tablero, 1)
-                    ganarJ2 = validar_ganador(combinaciones_tricky, tablero, 2)
+                    if player == 1:
+                        posicion = funciones.obtener_posicion(tablero,
+                                                              fila_pulsada, columna_pulsada, player)
+                        if posicion:
+                            pygame.draw.circle(
+                                ventana, COLOR_BOLA, (X, Y), 60, 15)
+                            player = 2
+
+                    ganarJ1 = funciones.validar_ganador(ventana, tablero, 1)
+                    ganarJ2 = funciones.validar_ganador(ventana, tablero, 2)
                     if ganarJ1:
-                        ganador_ronda = j1
-                        mensaje = f"El jugador {ganador_ronda} hizó tricky"
+                        victorias[0] += 1
+                        resultado = 'j1'
+                        funciones.juego_terminado(ventana, nombre, resultado)
                         fin = True
 
-                    elif ganarJ2:
-                        ganador_ronda = j2
-                        mensaje = f"El jugador {ganador_ronda} hizó tricky"
-                        fin = True
+                if (player == 2 and p_disponibles) and not fin:
+                    ia = ia_movimientos.escoger_movimiento(
+                        tablero, dificultad, 1)
+                    if ia is not None:
+                        fila_sel = ia[0]
+                        col_sel = ia[1]
+                        posicion = funciones.obtener_posicion(tablero,
+                                                              fila_sel, col_sel, player)
+                        if posicion:
+                            X = int(col_sel * 200 + 100)
+                            Y = int(fila_sel * 200 + 180)
+                            pygame.draw.line(
+                                ventana, COLOR_EQUIS, (X - 60, Y - 60), (X + 60, Y + 60), 25)
+                            pygame.draw.line(
+                                ventana, COLOR_EQUIS, (X - 60, Y + 60), (X + 60, Y - 60), 25)
+                            player = 1
 
-                    break
-                print(tablero)
+                        ganarJ2 = funciones.validar_ganador(
+                            ventana, tablero, 2)
+                        if ganarJ2:
+                            victorias[1] += 1
+                            resultado = 'ia'
+                            funciones.juego_terminado(
+                                ventana, nombre, resultado)
+                            fin = True
 
-            # if evento.type == pygame.KEYDOWN:
-                #     if evento.key == pygame.K_KP_ENTER:
-            #         ventana.fill(COLOR_FONDO)
-            #         dibujar_lineas()
-            #         player = 1
-            #         tablero = [' ' for _ in range(9)]
-            #         posiciones_disponibles = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_SPACE:
+                        tablero = [[0 for _ in range(3)] for _ in range(3)]
+                        ronda += 1
+                        ventana.fill(COLOR_FONDO)
+                        funciones.dibujar_lineas(ventana)
+                        funciones.marcador(ventana, nombre, victorias, ronda)
+                        player = 1
+                        fin = False
 
-        pygame.display.update()
+                if len(p_disponibles) == 0 and resultado == "":
+                    resultado = 'Empate'
+                    funciones.juego_terminado(ventana, nombre, resultado)
 
-
-# empezar_juegoIa()
+            pygame.display.update()
+    except Exception as e:
+        print('Errror en el funcionamiento de ia.py')
+        print(e)

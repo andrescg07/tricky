@@ -1,57 +1,130 @@
 """Modulo que contiene las funciones necesarias para el juego"""
+import pygame
 
 
-def definir_turnos(primero: str, segundo: str, ronda: int) -> list:
-    """Para cada ronda definir quien empieza el juego y con que valor X/O juega cada jugador"""
-    turno1, turno2, valor1, valor2 = "", "", "", ""
-    if ronda % 2 == 0:
-        turno1, valor1, turno2, valor2 = segundo, 'X', primero, 'O'
+pygame.init()
+fuente = pygame.font.Font(None, 35)
+fuente_resultado = pygame.font.Font(None, 60)
+ANCHO = 600
+ALTO = 700
+ANCHO_LINEAS = 15
 
-    else:
-        turno1, valor1, turno2, valor2 = primero, 'X', segundo, 'O'
-
-    return [turno1, valor1, turno2, valor2]
-
-
-def validar_posicion(disponibles: list, jugador: str) -> int:
-    """Pedir al usuario, ingresar una posicion y retornarla para actualizar el tablero"""
-    while True:
-        try:
-            entrada_usuario = int(
-                input(f'{jugador} Ingresa una posicion 1-9 para marcar en le tablero: '))
-            if entrada_usuario in disponibles:
-                return entrada_usuario
-            else:
-                print(
-                    f'la posicion {entrada_usuario} está ocupada o no es valida, pruebe nuevamente ')
-        except ValueError:
-            print('Error al ingresar la posicion, valor no valido')
+COLOR_FONDO = (180, 180, 180)
+ROJO = (200, 0, 0)
+COLOR_LINEAS = (23, 145, 135)
+NEGRO = (0, 0, 0)
+COLOR_BOLA = (239, 231, 200)
+COLOR_EQUIS = (52, 73, 94)
+COLOR_RESULTADO = (60, 60, 60)
 
 
-def actualizar_tablero(tabla: list, posicion: int, valor: str) -> list:
-    """reemplazar y actualizar cada posicion validada con el valor X/O por cada jugador"""
-    tabla[posicion - 1] = valor
-    return tabla
+def obtener_posicion(tablero: list, fila: int, columna: int, jugador: int) -> bool:
+    """recibe una fila y columna, valida  la posicion en el tablero y la asigna al jugador que ha marcado
+
+    Args: 
+        fila (int): Numero de la fila 0-2 marcada
+        columna (int): Numero de la columna 0-2 marcada
+    Returns:
+        True (bool): en caso de que la posicion sea valida y sea asignada al jugador
+        False (bool): en caso de que la posicion marcada no sea valida
+    """
+    if 0 <= fila <= 2 and 0 <= columna <= 2:
+        if tablero[fila][columna] == 0:
+            tablero[fila][columna] = jugador
+            return True
+        # Devolver False si la fila o la columna no son válidas o están ocupadas
+        return False
 
 
-def validar_ganador(combinaciones: list, tablero: list, jugador: str):
+def dibujar_lineas(ventana):
+    # Horizontales
+    pygame.draw.line(ventana, COLOR_LINEAS, (10, 280),
+                     (600, 280), ANCHO_LINEAS)
+    pygame.draw.line(ventana, COLOR_LINEAS, (10, 480),
+                     (600, 480), ANCHO_LINEAS)
+
+    # Verticales
+    pygame.draw.line(ventana, COLOR_LINEAS, (200, 80),
+                     (200, 680), ANCHO_LINEAS)
+    pygame.draw.line(ventana, COLOR_LINEAS, (400, 80),
+                     (400, 680), ANCHO_LINEAS)
+
+
+def lineas_ganadoras(ventana, sentido: str, colfil: int, jug: int):
+
+    color_linea = (COLOR_BOLA if jug == 1 else COLOR_EQUIS)
+
+    if sentido == 'vertical':
+        posX = int(colfil * 200 + 100)
+        pygame.draw.line(ventana, color_linea, (posX, 80),
+                         (posX, 680), ANCHO_LINEAS)
+
+    elif sentido == 'horizontal':
+        posY = int(colfil*200 + 180)
+        pygame.draw.line(ventana, color_linea, (10, posY),
+                         (590, posY), ANCHO_LINEAS)
+
+    elif sentido == 'ascendente':
+        pygame.draw.line(ventana, color_linea, (10, 680),
+                         (590, 80), ANCHO_LINEAS)
+
+    elif sentido == 'descendente':
+        pygame.draw.line(ventana, color_linea, (10, 80),
+                         (590, 680), ANCHO_LINEAS)
+
+
+def marcador(ventana, nombre1: str, victorias: list, ronda: int, nombre2="IA"):
+    texto = fuente.render(
+        f'MARCADOR:  {nombre1.upper()} ({victorias[0]}) || {nombre2.upper()} ({victorias[1]}) || RONDA: {ronda}', True, NEGRO, COLOR_BOLA)
+    ventana.blit(texto, (16, 10))
+
+
+def juego_terminado(ventana, result: str, nombre=""):
+
+    if result == "Empate":
+        empate = fuente_resultado.render(
+            f'EMPATE', True, COLOR_BOLA, COLOR_RESULTADO)
+        ventana.blit(empate, (180, 275))
+
+    elif result == "j1":
+        j1victoria = fuente_resultado.render(
+            f'{nombre.upper()} HIZO TRICKY', True, COLOR_BOLA, COLOR_RESULTADO)
+        ventana.blit(j1victoria, (50, 275))
+
+    elif result == "j2":
+        j2victoria = fuente_resultado.render(
+            f'{nombre.upper()} HIZO TRICKY', True, COLOR_BOLA, COLOR_RESULTADO)
+        ventana.blit(j2victoria, (50, 275))
+
+    elif result == "ia":
+        iavictoria = fuente_resultado.render(
+            f'LA IA GANÓ EL JUEGO', True, COLOR_BOLA, COLOR_RESULTADO)
+        ventana.blit(iavictoria, (50, 275))
+
+
+def validar_ganador(ventana, tablero: list, playerI: int):
     """ Recibir el tablero y validar si un jugador ha hecho tricky"""
-    for combinacion in combinaciones:
-        if all(tablero[int(num)] == jugador for num in combinacion):
+    aux = 0
+    # vertical
+    for col in range(3):
+        if tablero[0][col] == playerI and (tablero[1][col] == playerI and tablero[2][col] == playerI):
+            lineas_ganadoras(ventana, 'vertical', col, playerI)
             return True
 
+    # horizontal win check
+    for filaa in range(3):
+        if tablero[filaa][0] == playerI and (tablero[filaa][1] == playerI and tablero[filaa][2] == playerI):
+            lineas_ganadoras(ventana, 'horizontal', filaa, playerI)
+            return True
+
+    # asc diagonal win check
+    if tablero[2][0] == playerI and tablero[1][1] == playerI and tablero[0][2] == playerI:
+        lineas_ganadoras(ventana, 'ascendente', aux, playerI)
+        return True
+
+    # desc diagonal win chek
+    if tablero[0][0] == playerI and tablero[1][1] == playerI and tablero[2][2] == playerI:
+        lineas_ganadoras(ventana, 'descendente', aux, playerI)
+        return True
+
     return False
-
-
-def mostrar_tablero(tablero: list, victorias: dict, j1: str, j2: str, disponibles: list):
-    """Mostrar e imprimir el marcador de victorias, el tabalero actualizado en cada ronda e iteracion"""
-    print('\033[1mVICTORIAS:\033[0m ')
-    print(f'{j1.lower()} == {victorias[j1]} ------- {j2.lower()} == {victorias[j2]} ')  # noqa
-    print(
-        f'Posiciones disponibles tablero: {[i for i in disponibles]} \n')
-
-    for casilla in range(0, len(tablero), 3):
-        fila = tablero[casilla:casilla+3]
-        print(' | '.join(fila))
-        print('----------' if casilla < 6 else '')
-    print('\n')

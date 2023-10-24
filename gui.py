@@ -4,6 +4,7 @@ para diseñar las iterfaces graficas y ejecutable del juego"""
 import tkinter as tk
 from PIL import Image, ImageTk
 import ia
+import jcj
 
 
 # ---------------------------------------------------
@@ -16,11 +17,37 @@ FACIL = 'facil'
 DIFICIL = 'dificil'
 
 
+def nombresJCJ(ventana):
+    ventana.destroy()
+    nombres = tk.Tk()
+    nombres.title("Nombres de Jugadores")
+    nombres.iconbitmap(r"D:\DESARROLLO PYTHON\tricky\logo.ico")
+    nombres.config(bg="#66CDAA")
+    nombres.geometry("500x300")
+    nombres.resizable(False, False)
+
+    etiqueta_j1 = tk.Label(
+        nombres, text="Nombre del primer Jugador:", bg="#66CDAA", font=cascadia_botones)
+    etiqueta_j1.place(x=120, y=15)
+    entrada_j1 = tk.Entry(nombres)
+    entrada_j1.place(x=170, y=46)
+
+    etiqueta_j2 = tk.Label(
+        nombres, text="Nombre del segundo Jugador:", bg="#66CDAA", font=cascadia_botones)
+    etiqueta_j2.place(x=120, y=80)
+    entrada_j2 = tk.Entry(nombres)
+    entrada_j2.place(x=170, y=120)
+
+    boton_comenzar = tk.Button(nombres, text="Comenzar Juego",
+                               command=lambda: jcj.juego_JCJ(entrada_j1.get(), entrada_j2.get(), nombres), font=cascadia_botones, activebackground="#66CDAA", cursor="hand2")
+    boton_comenzar.place(x=160, y=180)
+
+
 def obtener_nombre(dificultad, ventana):
     ventana.destroy()
     nombre = tk.Tk()
-    nombre.title("Nombres de Jugadores")
-    nombre.iconbitmap("logo.ico")
+    nombre.title("Nombre de Jugador")
+    nombre.iconbitmap(r"D:\DESARROLLO PYTHON\tricky\logo.ico")
     nombre.config(bg="#66CDAA")
     nombre.geometry("500x300")
     nombre.resizable(False, False)
@@ -41,7 +68,7 @@ def abrir_vs_ia(home):
     home.destroy()
     ventana_vs_ia = tk.Tk()
     ventana_vs_ia.title("JUEGO CONTRA LA IA")
-    ventana_vs_ia.iconbitmap("logo.ico")
+    ventana_vs_ia.iconbitmap(r"D:\DESARROLLO PYTHON\tricky\logo.ico")
     ventana_vs_ia.config(bg="#66CDAA")
     ventana_vs_ia.geometry("500x300")
     ventana_vs_ia.resizable(False, False)
@@ -54,7 +81,7 @@ def abrir_vs_ia(home):
     facil_boton.place(x=110, y=130)
 
     dificil_boton = tk.Button(
-        ventana_vs_ia, text="Dificil", font=cascadia_botones, activebackground="#66CDAA", cursor="hand2", padx=20, pady=10)
+        ventana_vs_ia, text="Dificil", command=lambda: obtener_nombre(DIFICIL, ventana_vs_ia), font=cascadia_botones, activebackground="#66CDAA", cursor="hand2", padx=20, pady=10)
     dificil_boton.place(x=250, y=130)
 
     ventana_vs_ia.mainloop()
@@ -64,7 +91,7 @@ def abrir_vs_ia(home):
 # crear la raiz o interfaz principal del juego
 raiz = tk.Tk()
 raiz.geometry("800x800")
-raiz.iconbitmap("logo.ico")
+raiz.iconbitmap(r"D:\DESARROLLO PYTHON\tricky\logo.ico")
 raiz.title("Tricky")
 raiz.config(bg="#66CDAA")
 
@@ -76,7 +103,7 @@ frame_inicio.config(width=850, height=300, bg="#F0F8FF")
 
 
 # cargar, procesar el texto e imagen principal
-abrir_img = Image.open("home.png")
+abrir_img = Image.open(r"D:\DESARROLLO PYTHON\tricky\home.png")
 ancho = 250
 alto = 250
 redimensionar = abrir_img.resize((ancho, alto), Image.LANCZOS)
@@ -97,10 +124,10 @@ ia_boton = tk.Button(
 ia_boton.place(x=280, y=410)
 
 jcj_boton = tk.Button(
-    frame_inicio, text="Jugar contra otra persona", font=cascadia_botones, activebackground="#66CDAA", cursor="hand2", pady=10)
+    frame_inicio, text="Jugar contra otra persona", command=lambda: nombresJCJ(raiz), font=cascadia_botones, activebackground="#66CDAA", cursor="hand2", pady=10)
 jcj_boton.place(x=280, y=475)
 
 salir_boton = tk.Button(
-    frame_inicio, text="Salir", font=cascadia_botones, cursor="hand2", activebackground="#66CDAA", padx=90, pady=10)
+    frame_inicio, text="Salir", command=lambda: exit(), font=cascadia_botones, cursor="hand2", activebackground="#66CDAA", padx=90, pady=10)
 salir_boton.place(x=280, y=540)
 raiz.mainloop()
